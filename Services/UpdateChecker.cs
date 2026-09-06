@@ -23,10 +23,10 @@ public static class UpdateChecker
     /// </summary>
     public static async Task<(bool HasUpdate, string? Version, string? Url)> CheckAsync()
     {
-        // 替换为实际的 owner/repo
+        // Follow this fork's cross-platform releases.
         var url = ReleasesUrl
-            .Replace("{owner}", "Lenkmat")
-            .Replace("{repo}", "endfield-charge");
+            .Replace("{owner}", "wuzhiu")
+            .Replace("{repo}", "zmd-charge");
 
         var response = await Client.GetAsync(url);
         response.EnsureSuccessStatusCode();

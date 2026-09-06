@@ -3,6 +3,15 @@
 插上 / 拔掉充电器时，从屏幕顶部弹出一块"灵动岛"式 HUD，显示当前电量（mWh 与百分比）。
 视觉与动画风格复刻《终末地》工业 / 超充模式 HUD。
 
+## Fork 说明
+
+本仓库 Fork 自 [QinAnze/zmd-charge](https://github.com/QinAnze/zmd-charge)，保留上游的
+Windows HUD、动画和设置功能，并在此基础上增加 Arch Linux x86_64 支持、Linux 电池读取、
+托盘适配、XDG 登录自启、跨平台构建与测试。原程序作者署名 `Lenkmat` 保留在项目元数据中。
+
+当前 Fork 的下载、问题反馈与更新发布均以
+[wuzhiu/zmd-charge](https://github.com/wuzhiu/zmd-charge) 为准。
+
 - **插电**：完整三态动画 —— 电标弹出 → 胶囊撑高成圆角矩形显示「超充模式」→ 收成圆胶囊显示电量 → 停留 → 整体缩小收回
 - **拔电**：简化动画 —— 只弹电量圆胶囊，内容在胶囊完全出来后快速显现 → 停留 → 收回
 
@@ -60,7 +69,7 @@ Linux 版直接读取 `/sys/class/power_supply`，不需要 root 或 UPower，�
 | 托盘菜单 | 左键单击弹出自定义深色菜单（预览 / 设置 / 检查更新 / 退出） |
 | 动画微调 | 设置窗口「动画」页实时预览并微调时长 / 回弹 / 波纹参数，保存即生效并持久化 |
 | 节能模式提示 | 开 / 关节能（省电）模式时弹出对应 HUD。24H2+（build 26100+）订阅 GUID_ENERGY_SAVER_STATUS 通知、轮询注册表 EnergySaverState；旧系统用 GUID_POWER_SAVING_STATUS + SystemStatusFlag。设置「通知」页可开关 |
-| 检查更新 | 读取 GitHub Releases API，比较程序集版本，一键跳转下载页 |
+| 检查更新 | 读取当前 Fork 的 GitHub Releases，比较程序集版本，一键跳转下载页 |
 | 多语言 | 中文 / 英文，默认跟随系统，可在设置中手动切换 |
 | 开机自启 | 设置窗口「通用」页开关，写 `HKCU\...\CurrentVersion\Run`（当前用户级，无需管理员） |
 | 统一图标 | 托盘 / 各窗口 / exe / 安装器 / 卸载器统一使用 `Assets\tray_bolt` 图标 |
