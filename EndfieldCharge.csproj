@@ -22,7 +22,8 @@
     <!-- 单文件发布，方便丢进开机启动 -->
     <PublishSingleFile Condition="'$(Configuration)'=='Release'">true</PublishSingleFile>
     <SelfContained Condition="'$(Configuration)'=='Release'">false</SelfContained>
-    <!-- Target-specific service files keep Windows APIs out of the Linux backend. -->
+    <!-- CI restores before choosing Release; prefetch both runtime graphs for single-file builds. -->
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
