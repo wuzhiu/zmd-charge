@@ -1,0 +1,36 @@
+name: Build Linux
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Test sysfs battery backend
+        run: dotnet run --project tests/LinuxBatteryTests
+      - name: Publish standalone Linux package
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -o publish/linux-x64 -p:TreatWarningsAsErrors=true
+      - name: Test GUI startup with virtual X11 display
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libice6 libsm6 libfontconfig1
+          set +e
+          xvfb-run -a timeout 12s ./publish/linux-x64/EndfieldCharge --demo
+          result=$?
+          set -e
+          test "$result" -eq 124
+      - name: Archive
+        run: tar -czf EndfieldCharge-linux-x64.tar.gz -C publish/linux-x64 .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EndfieldCharge-linux-x64
+          path: EndfieldCharge-linux-x64.tar.gz

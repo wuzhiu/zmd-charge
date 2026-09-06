@@ -60,7 +60,8 @@ public static class Localization
     public static string SectionPosition => IsChinese ? "位置与语言" : "Position & Language";
     public static string SectionStartup => IsChinese ? "启动" : "Startup";
     public static string SectionAlertSettings => IsChinese ? "提醒设置" : "Alert Settings";
-    public static string DescAutoStart => IsChinese ? "登录 Windows 时自动启动" : "Auto start on Windows login";
+    public static string DescAutoStart => IsChinese ? "登录桌面时自动启动" : "Auto start on desktop login";
+    public static string LinuxSaverUnavailable => IsChinese ? "Linux 首版暂不监听省电模式" : "Power saver monitoring is not available in this Linux preview.";
     public static string DescLowBatteryAlert => IsChinese ? "电量低于阈值时弹窗提醒" : "Alert when battery drops below threshold";
     public static string DescFullChargeAlert => IsChinese ? "电池充满后弹窗通知" : "Notify when battery is fully charged";
 

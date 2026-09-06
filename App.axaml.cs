@@ -67,6 +67,8 @@ public partial class App : Application
             _ = PreviewSimpleAsync();
         else if (HasCommandLineArg("--preview"))
             _ = TriggerHudAsync();
+        else if (HasCommandLineArg("--settings"))
+            OpenSettingsWindow();
 
         base.OnFrameworkInitializationCompleted();
     }
@@ -313,7 +315,23 @@ public partial class App : Application
             IsVisible = true,
         };
 
-        _tray.Clicked += OnTrayClicked;
+        if (OperatingSystem.IsLinux())
+        {
+            var menu = new NativeMenu();
+            var preview = new NativeMenuItem(Localization.PreviewHud);
+            preview.Click += (_, _) => _ = TriggerHudAsync();
+            var settings = new NativeMenuItem(Localization.Settings);
+            settings.Click += (_, _) => OpenSettingsWindow();
+            var exit = new NativeMenuItem(Localization.Exit);
+            exit.Click += (_, _) => _desktop?.Shutdown();
+            menu.Items.Add(preview);
+            menu.Items.Add(settings);
+            menu.Items.Add(exit);
+            _tray.Menu = menu;
+            _tray.Clicked += (_, _) => _ = TriggerHudAsync();
+        }
+        else
+            _tray.Clicked += OnTrayClicked;
 
         try
         {

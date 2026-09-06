@@ -9,6 +9,7 @@
 
         SystemDecorations="None"
         Background="Transparent"
+        TransparencyLevelHint="Transparent"
 
         Topmost="True"
         ShowInTaskbar="False"

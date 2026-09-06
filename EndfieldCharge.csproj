@@ -2,13 +2,16 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and $([MSBuild]::IsOSPlatform('Linux'))">linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(RuntimeIdentifier)' == 'linux-x64'">net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <!-- SettingsWindow 只在代码中带参构造，XAML 运行时加载器警告为误报 -->
     <NoWarn>$(NoWarn);AVLN3001</NoWarn>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationManifest Condition="'$(RuntimeIdentifier)' == 'win-x64'">app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\tray_bolt.ico</ApplicationIcon>
     <AssemblyName>EndfieldCharge</AssemblyName>
     <RootNamespace>EndfieldCharge</RootNamespace>
@@ -19,11 +22,7 @@
     <!-- 单文件发布，方便丢进开机启动 -->
     <PublishSingleFile Condition="'$(Configuration)'=='Release'">true</PublishSingleFile>
     <SelfContained Condition="'$(Configuration)'=='Release'">false</SelfContained>
-    <!-- 无条件下发给 restore：CI 里 restore 不带 -c Release，若只有条件 RuntimeIdentifier，
-         assets 里就不会有 net8.0-windows/win-x64 目标，build/publish 会报
-         "Assets file doesn't have a target for 'net8.0-windows/win-x64'" -->
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <RuntimeIdentifier Condition="'$(Configuration)'=='Release'">win-x64</RuntimeIdentifier>
+    <!-- Target-specific service files keep Windows APIs out of the Linux backend. -->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
@@ -33,11 +32,18 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
     <!-- 电池信息兜底读取（主路径是 powrprof P/Invoke，无需此包；WMI 仅作备用） -->
-    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" Condition="'$(RuntimeIdentifier)' == 'win-x64'" />
   </ItemGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+    <Compile Remove="Services\BatteryService.cs;Services\PowerNative.cs;Services\PowerWatcher.cs;Services\AutoStart.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' != 'linux-x64'">
+    <Compile Remove="Services\Linux\**\*.cs" />
   </ItemGroup>
 
 </Project>

@@ -41,6 +41,12 @@ public partial class SettingsWindow : Window
 
         PopulateMonitors();
         LoadSettings(settings);
+        if (OperatingSystem.IsLinux())
+        {
+            PowerSaverSwitch.IsEnabled = false;
+            PowerSaverSwitch.IsChecked = false;
+            PowerSaverNotifyDesc.Text = Localization.LinuxSaverUnavailable;
+        }
 
         // Tab 切换
         TabGeneralBtn.PointerPressed += (_, _) => SwitchTab(TabGeneralBtn, GeneralPanel);

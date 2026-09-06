@@ -1,5 +1,37 @@
 # EndfieldCharge · 终末地风格电量 HUD
 
+## Arch Linux 首版
+
+支持 x86_64、X11 / XWayland。沿用原有 HUD 动画，直接读取
+`/sys/class/power_supply`，每 2 秒轮询插拔电源，400ms 复读确认。
+不需要 root 或 UPower。支持多电池、energy/charge 单位换算；只有百分比时容量显示 `--`。
+省电模式监听暂未实现，相关开关已禁用。原生 Wayland 定位与视觉优化留待后续。
+
+构建（需要 .NET 8 SDK）：
+
+```sh
+dotnet publish -c Release -r linux-x64 --self-contained true -o publish/linux-x64
+```
+
+复制整个 `publish/linux-x64` 文件夹到 Arch，包含随包运行时，无需另装 .NET。
+需要图形桌面、fontconfig、libice、libsm；Wayland 会话需要 XWayland。
+建议安装中文字体（例如 noto-fonts-cjk）。
+
+```sh
+chmod +x EndfieldCharge
+./EndfieldCharge --demo       # 示例动画；之后保持后台监听
+./EndfieldCharge --settings   # 设置入口（先退出已有实例）
+./EndfieldCharge              # 常驻，插拔电源显示 HUD
+```
+
+托盘菜单提供预览、设置和退出。桌面需支持 StatusNotifierItem/AppIndicator；
+GNOME 可能需要托盘扩展。无托盘时可用 `--settings` 启动，前台运行时用 Ctrl+C 退出。
+自启开关创建用户 XDG autostart 条目，请先将程序放在固定目录，再启用自启。
+设置保存在用户配置目录的 `EndfieldCharge/settings.json`。
+
+Linux CI 独立构建 `EndfieldCharge-linux-x64.tar.gz`，包含电池模拟测试与 X11 启动检查。
+Windows 仍通过原工作流独立打包。Linux 首版检查更新暂不适用（设置页仍指向上游 Windows 发布）。
+
 插上 / 拔掉充电器时，从屏幕顶部弹出一块"灵动岛"式 HUD，显示当前电量（mWh 与百分比）。
 视觉与动画风格复刻《终末地》工业 / 超充模式 HUD。
 

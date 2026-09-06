@@ -6,7 +6,7 @@ namespace EndfieldCharge;
 
 class Program
 {
-    private const string SingleInstanceMutexName = @"Local\EndfieldCharge_SingleInstance_7C1D";
+    private const string SingleInstanceMutexName = "EndfieldCharge_SingleInstance_7C1D";
 
     [STAThread]
     public static void Main(string[] args)

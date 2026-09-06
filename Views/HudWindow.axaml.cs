@@ -208,8 +208,8 @@ public partial class HudWindow : Window
         }
         else
         {
-            WhValueText.Text = (snap.RemainingWh * 1000).ToString("F0");
-            WhMaxText.Text = $"/{snap.FullWh * 1000:F0}";
+            WhValueText.Text = snap.FullWh > 0 ? (snap.RemainingWh * 1000).ToString("F0") : "--";
+            WhMaxText.Text = snap.FullWh > 0 ? $"/{snap.FullWh * 1000:F0}" : string.Empty;
             PercentText.Text = snap.Percent.ToString();
             fraction = Math.Clamp(snap.Percent / 100d, 0d, 1d);
         }
