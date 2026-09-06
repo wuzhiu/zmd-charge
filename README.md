@@ -1,51 +1,52 @@
 # EndfieldCharge · 终末地风格电量 HUD
 
-## Arch Linux 首版
-
-支持 x86_64、X11 / XWayland。沿用原有 HUD 动画，直接读取
-`/sys/class/power_supply`，每 2 秒轮询插拔电源，400ms 复读确认。
-不需要 root 或 UPower。支持多电池、energy/charge 单位换算；只有百分比时容量显示 `--`。
-省电模式监听暂未实现，相关开关已禁用。原生 Wayland 定位与视觉优化留待后续。
-
-构建（需要 .NET 8 SDK）：
-
-```sh
-dotnet publish -c Release -r linux-x64 --self-contained true -o publish/linux-x64
-```
-
-复制整个 `publish/linux-x64` 文件夹到 Arch，包含随包运行时，无需另装 .NET。
-需要图形桌面、fontconfig、libice、libsm；Wayland 会话需要 XWayland。
-建议安装中文字体（例如 noto-fonts-cjk）。
-
-```sh
-chmod +x EndfieldCharge
-./EndfieldCharge --demo       # 示例动画；之后保持后台监听
-./EndfieldCharge --settings   # 设置入口（先退出已有实例）
-./EndfieldCharge              # 常驻，插拔电源显示 HUD
-```
-
-托盘菜单提供预览、设置和退出。桌面需支持 StatusNotifierItem/AppIndicator；
-GNOME 可能需要托盘扩展。无托盘时可用 `--settings` 启动，前台运行时用 Ctrl+C 退出。
-自启开关创建用户 XDG autostart 条目，请先将程序放在固定目录，再启用自启。
-设置保存在用户配置目录的 `EndfieldCharge/settings.json`。
-
-Linux CI 独立构建 `EndfieldCharge-linux-x64.tar.gz`，包含电池模拟测试与 X11 启动检查。
-Windows 仍通过原工作流独立打包。Linux 首版检查更新暂不适用（设置页仍指向上游 Windows 发布）。
-
 插上 / 拔掉充电器时，从屏幕顶部弹出一块"灵动岛"式 HUD，显示当前电量（mWh 与百分比）。
 视觉与动画风格复刻《终末地》工业 / 超充模式 HUD。
 
 - **插电**：完整三态动画 —— 电标弹出 → 胶囊撑高成圆角矩形显示「超充模式」→ 收成圆胶囊显示电量 → 停留 → 整体缩小收回
 - **拔电**：简化动画 —— 只弹电量圆胶囊，内容在胶囊完全出来后快速显现 → 停留 → 收回
 
-## 下载安装
+## 下载与安装
 
-从 [Releases](https://github.com/Lenkmat/endfield-charge/releases) 下载：
+从本仓库的 [Releases](https://github.com/wuzhiu/zmd-charge/releases/latest) 下载对应平台的文件。
 
-| 文件 | 说明 |
-|------|------|
-| `EndfieldCharge-x.y.z-setup.exe` | Inno Setup 安装版（中文/英文向导，可选桌面快捷方式与开机自启） |
-| `EndfieldCharge-x.y.z-portable.zip` | 便携版，解压即用 |
+### Windows 10 / 11（x64）
+
+| 文件 | 安装方式 |
+|------|----------|
+| `EndfieldCharge-x.y.z-setup.exe` | 双击运行安装向导，可选桌面快捷方式和开机自启 |
+| `EndfieldCharge-x.y.z-portable.zip` | 解压整个目录后运行 `EndfieldCharge.exe` |
+
+Windows 包需要 [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)。
+便携版中的原生库必须和 `EndfieldCharge.exe` 放在同一目录。
+
+### Arch Linux（x86_64，首版）
+
+下载 `EndfieldCharge-x.y.z-linux-x64.tar.gz`，然后执行：
+
+```sh
+sudo pacman -S --needed libx11 libice libsm fontconfig
+# Wayland 会话还需要 XWayland：sudo pacman -S --needed xorg-xwayland
+
+mkdir -p ~/.local/opt/endfield-charge ~/.local/bin
+tar -xzf ~/Downloads/EndfieldCharge-*-linux-x64.tar.gz \
+  -C ~/.local/opt/endfield-charge
+chmod +x ~/.local/opt/endfield-charge/EndfieldCharge
+ln -sfn ~/.local/opt/endfield-charge/EndfieldCharge \
+  ~/.local/bin/endfield-charge
+
+~/.local/bin/endfield-charge --demo  # 测试 HUD 动画
+~/.local/bin/endfield-charge         # 正常启动并监听电源插拔
+```
+
+Linux 包已包含 .NET 运行时，无需另装 .NET。中文显示建议安装 `noto-fonts-cjk`。
+KDE Plasma 托盘已实机验证；GNOME 需要支持 StatusNotifierItem/AppIndicator 的托盘扩展。
+如果托盘不可见，可先退出已有进程，再用 `endfield-charge --settings` 打开设置。
+安装到固定目录后，可在设置的「通用」页面启用登录自启。
+
+Linux 版直接读取 `/sys/class/power_supply`，不需要 root 或 UPower，支持多电池以及
+`energy_*` / `charge_*` 两类设备数据。当前通过 X11 / XWayland 运行；省电模式通知和
+原生 Wayland 定位仍待完善。
 
 ## 功能
 
@@ -67,20 +68,22 @@ Windows 仍通过原工作流独立打包。Linux 首版检查更新暂不适用
 
 ## 运行要求
 
-- Windows 10 1809+ / Windows 11
-- .NET 8 运行时（Release 为框架依赖单文件发布，需安装 [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)）
-- x64
+- Windows：Windows 10 1809+ / Windows 11 x64，并安装 .NET 8 Desktop Runtime
+- Arch Linux：x86_64 图形桌面及上述 X11 依赖；Wayland 会话通过 XWayland 运行
 
 ## 构建
 
 ```bash
-# 调试
+# 在当前平台调试
 dotnet build -c Debug
 
-# 发布（单文件 exe，输出到 publish/）
-dotnet publish -c Release -o publish
+# Windows x64（需要目标机安装 .NET 8 Desktop Runtime）
+dotnet publish -c Release -r win-x64 --self-contained false -o publish/windows-x64
 
-# 本地打安装包（需安装 Inno Setup，iscc 在 PATH 中）
+# Linux x64（自包含运行时）
+dotnet publish -c Release -r linux-x64 --self-contained true -o publish/linux-x64
+
+# Windows 安装包（需安装 Inno Setup，iscc 在 PATH 中）
 iscc installer\EndfieldCharge.iss
 ```
 
@@ -90,13 +93,13 @@ iscc installer\EndfieldCharge.iss
 
 ### CI / 发布（GitHub Actions）
 
-推送到 `main` 分支会自动构建安装包与便携版 zip（Actions 页面可下载 artifact）。
-推送 `v*` 标签（如 `v1.0.0`）会额外创建 GitHub Release，并把标签版本号写入
-程序集版本与安装包文件名：
+推送到 `main` 分支会分别运行 Windows 和 Linux 工作流，可从 Actions 下载构建产物。
+推送 `v*` 标签（如 `v1.1.0`）会构建 Windows 安装包与便携包、创建 GitHub Release，
+并把标签版本号写入程序集和文件名。Linux Release 包当前单独构建后上传：
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 ## 调试参数
@@ -110,6 +113,7 @@ git push origin v1.0.0
 | `--preview-unplug` | 用示例数据播放一次**简化**动画（拔电） |
 | `--debug-ring` | 静态呈现状态 C（电量态）1.5s |
 | `--power-log` | 输出电源事件日志到 `%TEMP%\power-log.txt` |
+| `--settings` | 直接打开设置窗口，适合托盘不可见的 Linux 桌面 |
 
 > 注意：这几个参数互斥，按 `--demo` → `--preview-unplug` → `--preview` 的优先级生效。
 
@@ -125,6 +129,7 @@ EndfieldCharge/
 │  ├─ Logger.cs             # 文件日志（%TEMP%\EndfieldCharge\）
 │  ├─ PowerNative.cs        # P/Invoke：powrprof、message-only 窗口
 │  ├─ PowerWatcher.cs       # 电源变化监听 + 去抖确认
+│  ├─ Linux/                # Linux sysfs 电池读取、轮询监听与 XDG 自启
 │  └─ UpdateChecker.cs      # GitHub Releases 更新检查
 ├─ Settings/
 │  ├─ AppSettings.cs        # 设置模型（缩放/动画微调/位置/显示器/语言/提醒）
@@ -139,7 +144,8 @@ EndfieldCharge/
 ├─ installer/
 │  ├─ EndfieldCharge.iss    # Inno Setup 安装脚本
 │  └─ Languages/            # 中文本地化（随仓库分发）
-└─ .github/workflows/       # CI：自动构建 + 打标签发 Release
+├─ tests/LinuxBatteryTests/ # Linux 电池后端模拟测试
+└─ .github/workflows/       # Windows / Linux 独立构建工作流
 ```
 
 ## 动画实现要点
