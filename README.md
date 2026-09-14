@@ -51,7 +51,8 @@ ln -sfn ~/.local/opt/endfield-charge/EndfieldCharge \
 Linux 包已包含 .NET 运行时，无需另装 .NET。中文显示建议安装 `noto-fonts-cjk`。
 KDE Plasma 托盘已实机验证；GNOME 需要支持 StatusNotifierItem/AppIndicator 的托盘扩展。
 如果托盘不可见，可先退出已有进程，再用 `endfield-charge --settings` 打开设置。
-安装到固定目录后，可在设置的「通用」页面启用登录自启。
+安装到固定目录后，可在设置的「通用」页面启用登录自启。条目写入
+`$XDG_CONFIG_HOME/autostart`，未设置时使用 `~/.config/autostart`。
 
 Linux 版直接读取 `/sys/class/power_supply`，不需要 root 或 UPower，支持多电池以及
 `energy_*` / `charge_*` 两类设备数据。当前通过 X11 / XWayland 运行；省电模式通知和
